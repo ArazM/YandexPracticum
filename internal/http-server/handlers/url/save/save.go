@@ -89,6 +89,14 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		// }
 		alias, err := urlSaver.CheckURL(req.URL)
 
+		if err != nil {
+			log.Error("failed to check url", sl.Err(err))
+			w.WriteHeader(http.StatusBadRequest)
+			render.JSON(w, r, resp.Error("failed to o check url"))
+
+			return
+		}
+
 		if alias == "" {
 			alias = random.NewRandomString(aliasLength)
 		}
