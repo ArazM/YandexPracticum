@@ -8,7 +8,7 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-const ConfigDir = "/Users/mamedalyevaraz/YandexPracticum/internal/config/local.yaml"
+// const ConfigDir = "github.com/ArazM/YandexPracticum/internal/config/local.yaml"
 
 type Config struct {
 	Env         string `yaml:"env" env-default:"development"`
@@ -24,7 +24,7 @@ type HTTPServer struct {
 
 func MustLoad() *Config {
 	// Получаем путь до конфиг-файла из env-переменной CONFIG_PATH
-	configPath := ConfigDir
+	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		log.Fatal("CONFIG_PATH environment variable is not set")
 	}
