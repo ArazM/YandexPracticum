@@ -1,4 +1,4 @@
-env: "local" # Окружение - local, dev или prod
+env: "dev" # Окружение - local, dev или prod
 storage_path: "/Users/mamedalyevaraz/YandexPracticum/internal/storage/storage.db" # файл, в котором будет храниться наша БД
 http_server: # конфигурация нашего http-сервера
   address: "localhost:8080"
