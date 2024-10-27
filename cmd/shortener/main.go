@@ -25,6 +25,7 @@ const (
 )
 
 func main() {
+	os.Setenv("CONFIG_PATH", "/Users/mamedalyevaraz/YandexPracticum/internal/config/local.yaml")
 	cfg := config.MustLoad()
 
 	log := setupLogger(cfg.Env)
