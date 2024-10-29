@@ -163,7 +163,7 @@ func responseOK(w http.ResponseWriter, r *http.Request, alias string) {
 	// })
 
 	host := r.Host
-	a := "http//" + host + "/"
+	a := "http://" + host + "/"
 	alias = a + alias
 	w.WriteHeader(http.StatusCreated)
 	render.PlainText(w, r, alias)
