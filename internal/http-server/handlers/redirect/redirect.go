@@ -59,7 +59,7 @@ func New(log *slog.Logger, urlGetter URLGetter) http.HandlerFunc {
 		}
 
 		log.Info("got url", slog.String("url", resURL))
-		// w.Header().Set("Location", resURL)
+		w.Header().Set("Location", resURL)
 		// w.Header()["Date"] = nil
 		// w.Header()["Content-Length"] = nil
 		w.WriteHeader(307)
