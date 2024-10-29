@@ -59,10 +59,13 @@ func New(log *slog.Logger, urlGetter URLGetter) http.HandlerFunc {
 		}
 
 		log.Info("got url", slog.String("url", resURL))
-
+		// w.Header().Set("Location", resURL)
+		// w.Header()["Date"] = nil
+		// w.Header()["Content-Length"] = nil
+		// w.WriteHeader(http.StatusTemporaryRedirect)
+		http.Redirect(w, r, resURL, http.StatusTemporaryRedirect)
 		// Делаем редирект на найденный URL
 		// http.Redirect(w, r, resURL, http.StatusFound)
-		w.Header().Add("Location", resURL)
-		w.WriteHeader(http.StatusTemporaryRedirect)
+
 	}
 }
