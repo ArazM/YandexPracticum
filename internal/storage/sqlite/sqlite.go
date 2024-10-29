@@ -103,7 +103,9 @@ func (s *Storage) CheckURL(url string) (string, error) {
 
 	err = stmt.QueryRow(url).Scan(&resAlias)
 	if errors.Is(err, sql.ErrNoRows) {
-		return "", storage.ErrURLNotFound
+		// return "", storage.ErrURLNotFound
+		resAlias = ""
+		return resAlias, nil
 	}
 	if err != nil {
 		return "", fmt.Errorf("%s: execute statement: %w", op, err)

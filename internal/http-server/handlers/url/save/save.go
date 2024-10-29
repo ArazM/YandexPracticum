@@ -47,31 +47,31 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		)
 
 		// Создаем объект запроса и анмаршаллим в него запрос
-		var req Request
+		// var req Request
 
-		err := render.DecodeJSON(r.Body, &req)
-		if errors.Is(err, io.EOF) {
-			// Такую ошибку встретим, если получили запрос с пустым телом
-			// Обработаем её отдельно
-			log.Error("request body is empty")
-			w.WriteHeader(http.StatusBadRequest)
-			render.JSON(w, r, resp.Response{
-				Status: resp.StatusError,
-				Error:  "empty request",
-			})
+		// err := render.DecodeJSON(r.Body, &req)
+		// if errors.Is(err, io.EOF) {
+		// 	// Такую ошибку встретим, если получили запрос с пустым телом
+		// 	// Обработаем её отдельно
+		// 	log.Error("request body is empty")
+		// 	w.WriteHeader(http.StatusBadRequest)
+		// 	render.JSON(w, r, resp.Response{
+		// 		Status: resp.StatusError,
+		// 		Error:  "empty request",
+		// 	})
 
-			return
-		}
-		if err != nil {
-			log.Error("failed to decode request body", sl.Err(err))
-			w.WriteHeader(http.StatusBadRequest)
-			render.JSON(w, r, resp.Response{
-				Status: resp.StatusError,
-				Error:  "failed to decode request",
-			})
+		// 	return
+		// }
+		// if err != nil {
+		// 	log.Error("failed to decode request body", sl.Err(err))
+		// 	w.WriteHeader(http.StatusBadRequest)
+		// 	render.JSON(w, r, resp.Response{
+		// 		Status: resp.StatusError,
+		// 		Error:  "failed to decode request",
+		// 	})
 
-			return
-		}
+		// 	return
+		// }
 
 		// if err := validator.New().Struct(req); err != nil {
 		// 	// Приводим ошибку к типу ошибки валидации
@@ -87,8 +87,34 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		// if alias == "" {
 		// 	alias = random.NewRandomString(aliasLength)
 		// }
-		alias, err := urlSaver.CheckURL(req.URL)
+		// alias, err := urlSaver.CheckURL(req.URL)
+		body, err := io.ReadAll(r.Body)
 
+		if errors.Is(err, io.EOF) {
+			// Такую ошибку встретим, если получили запрос с пустым телом
+			// Обработаем её отдельно
+			log.Error("request body is empty")
+			w.WriteHeader(http.StatusBadRequest)
+			render.JSON(w, r, resp.Response{
+				Status: resp.StatusError,
+				Error:  "empty request",
+			})
+
+			return
+		}
+
+		if err != nil {
+			log.Error("failed to decode request body", sl.Err(err))
+			w.WriteHeader(http.StatusBadRequest)
+			render.JSON(w, r, resp.Response{
+				Status: resp.StatusError,
+				Error:  "failed to decode request",
+			})
+
+			return
+		}
+
+		alias, err := urlSaver.CheckURL(string(body))
 		if err != nil {
 			log.Error("failed to check url", sl.Err(err))
 			w.WriteHeader(http.StatusBadRequest)
@@ -101,11 +127,11 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 			alias = random.NewRandomString(aliasLength)
 		}
 
-		id, err := urlSaver.SaveURL(req.URL, alias)
+		id, err := urlSaver.SaveURL(string(body), alias)
 		if errors.Is(err, storage.ErrURLExists) {
 			// Отдельно обрабатываем ситуацию,
 			// когда запись с таким Alias уже существует
-			log.Info("url already exists", slog.String("url", req.URL))
+			log.Info("url already exists", slog.String("url", string(body)))
 			w.WriteHeader(http.StatusBadRequest)
 			render.JSON(w, r, resp.Error("url already exists"))
 
@@ -124,7 +150,7 @@ func New(log *slog.Logger, urlSaver URLSaver) http.HandlerFunc {
 		responseOK(w, r, alias)
 		// Лучше больше логов, чем меньше - лишнее мы легко сможем почистить,
 		// при необходимости. А вот недостающую информацию мы уже не получим.
-		log.Info("request body decoded", slog.Any("req", req))
+		log.Info("request body decoded", slog.Any("req", string(body)))
 
 		// ...
 	}
